@@ -1,0 +1,9 @@
+[package]
+name = "rgl"
+version = "0.1.0"
+authors = ["Austin Jenkins <austin15328@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+gl = "*"
+either = "1.5.2"
