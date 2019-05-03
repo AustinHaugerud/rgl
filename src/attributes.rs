@@ -26,7 +26,7 @@ impl AttributeType {
         }
     }
 
-    fn get_stride(&self) -> GLsizei {
+    fn get_size(&self) -> GLsizei {
         use std::mem::size_of;
         match *self {
             AttributeType::Byte => size_of::<i8>() as GLsizei,
@@ -41,9 +41,28 @@ impl AttributeType {
     }
 }
 
+#[derive(Copy, Clone, Debug)]
+pub enum AttribVector {
+    Vec1,
+    Vec2,
+    Vec3,
+    Vec4,
+}
+
+impl AttribVector {
+    fn size(self) -> GLint {
+        match self {
+            AttribVector::Vec1 => 1,
+            AttribVector::Vec2 => 2,
+            AttribVector::Vec3 => 3,
+            AttribVector::Vec4 => 4,
+        }
+    }
+}
+
 pub fn vertex_attrib_pointer(
     index: GLuint,
-    size: GLint,
+    size: AttribVector,
     attribute_type: AttributeType,
     normalized: bool,
 ) -> RGLResult<()> {
@@ -52,10 +71,10 @@ pub fn vertex_attrib_pointer(
     unsafe {
         gl::VertexAttribPointer(
             index,
-            size,
+            size.size(),
             attribute_type.to_gl_code(),
             normalized as GLboolean,
-            attribute_type.get_stride(),
+            attribute_type.get_size() * size.size(),
             ptr::null(),
         );
     }
