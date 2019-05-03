@@ -24,6 +24,7 @@ pub struct Shader {
     shader_type: ShaderType,
 }
 
+#[derive(Copy, Clone, Debug)]
 pub enum ShaderObjectParameter {
     ShaderType,
     DeleteStatus,
@@ -33,8 +34,8 @@ pub enum ShaderObjectParameter {
 }
 
 impl ShaderObjectParameter {
-    fn to_gl_code(&self) -> GLenum {
-        match *self {
+    fn to_gl_code(self) -> GLenum {
+        match self {
             ShaderObjectParameter::ShaderType => gl::SHADER_TYPE,
             ShaderObjectParameter::DeleteStatus => gl::DELETE_STATUS,
             ShaderObjectParameter::CompileStatus => gl::COMPILE_STATUS,
@@ -49,6 +50,7 @@ pub struct ShaderProgram {
     pub(crate) program_id: GLuint,
 }
 
+#[derive(Copy, Clone, Debug)]
 pub enum ShaderProgramObjectParameter {
     DeleteStatus,
     LinkStatus,
@@ -62,8 +64,8 @@ pub enum ShaderProgramObjectParameter {
 }
 
 impl ShaderProgramObjectParameter {
-    fn to_gl_code(&self) -> GLenum {
-        match *self {
+    fn to_gl_code(self) -> GLenum {
+        match self {
             ShaderProgramObjectParameter::DeleteStatus => gl::DELETE_STATUS,
             ShaderProgramObjectParameter::LinkStatus => gl::LINK_STATUS,
             ShaderProgramObjectParameter::ValidateStatus => gl::VALIDATE_STATUS,
@@ -106,6 +108,7 @@ pub fn shader_source(shader: Shader, source: &str) -> RGLResult<()> {
     get_rgl_result(())
 }
 
+#[derive(Clone, Debug)]
 pub enum CompileShaderError {
     Standard(Vec<Error>),
     Compile(String),
@@ -160,6 +163,7 @@ pub fn get_shader_iv(shader: Shader, pname: ShaderObjectParameter) -> RGLResult<
     get_rgl_result(result)
 }
 
+#[derive(Clone, Debug)]
 pub enum InfoLogError {
     InvalidLog,
     Standard(Vec<Error>),
@@ -203,6 +207,7 @@ pub fn attach_shader(program: ShaderProgram, shader: Shader) -> RGLResult<()> {
     get_rgl_result(())
 }
 
+#[derive(Clone, Debug)]
 pub enum LinkProgramError {
     LinkFailure(String),
     Standard(Vec<Error>),
