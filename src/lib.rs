@@ -1,12 +1,14 @@
 extern crate gl;
 use gl::types::*;
 
-mod shader;
+mod attributes;
 mod buffer;
+mod shader;
 mod uniform;
 
-pub use shader::*;
+pub use attributes::*;
 pub use buffer::*;
+pub use shader::*;
 pub use uniform::*;
 
 pub type RGLResult<T> = Result<T, Vec<Error>>;
@@ -24,14 +26,14 @@ impl BufferType {
         match *self {
             BufferType::ColorBuffer => gl::COLOR_BUFFER_BIT,
             BufferType::DepthBuffer => gl::DEPTH_BUFFER_BIT,
-            BufferType::StencilBuffer => gl::STENCIL_BUFFER_BIT
+            BufferType::StencilBuffer => gl::STENCIL_BUFFER_BIT,
         }
     }
 }
 
 ////////////////////////////////////////////////////
 
-pub fn clear_color(r: f32,  g: f32, b: f32, a: f32) {
+pub fn clear_color(r: f32, g: f32, b: f32, a: f32) {
     unsafe {
         gl::ClearColor(r, g, b, a);
     }
@@ -72,24 +74,21 @@ impl Error {
             gl::STACK_UNDERFLOW => Ok(Error::StackUnderflow),
             gl::STACK_OVERFLOW => Ok(Error::StackOverflow),
             gl::CONTEXT_LOST => Ok(Error::ContextLost),
-            _ => Err(())
-        }
-    }
-
-    fn to_result<T>(success: T, errors: Vec<Error>) -> RGLResult<T> {
-        if errors.is_empty() {
-            Ok(success)
-        }
-        else {
-            Err(errors)
+            _ => Err(()),
         }
     }
 }
 
+fn make_rgl_result<T>(success: T, errors: Vec<Error>) -> RGLResult<T> {
+    if errors.is_empty() {
+        Ok(success)
+    } else {
+        Err(errors)
+    }
+}
+
 pub fn get_error() -> Result<Error, ()> {
-    let code = unsafe {
-        gl::GetError()
-    };
+    let code = unsafe { gl::GetError() };
 
     Error::from_gl_code(code)
 }
@@ -105,8 +104,7 @@ pub fn get_errors_unchecked() -> Vec<Error> {
         let error = get_error_unchecked();
         if error != Error::NoError {
             errors.push(error);
-        }
-        else {
+        } else {
             break;
         }
     }
@@ -116,7 +114,7 @@ pub fn get_errors_unchecked() -> Vec<Error> {
 
 pub fn get_rgl_result<T>(success: T) -> RGLResult<T> {
     let errors = get_errors_unchecked();
-    Error::to_result(success, errors)
+    make_rgl_result(success, errors)
 }
 
 ////////////////////////////////////////////////////

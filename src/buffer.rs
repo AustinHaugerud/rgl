@@ -1,25 +1,22 @@
+use crate::get_rgl_result;
+use crate::RGLResult;
 use gl::types::*;
 use std::ffi::c_void;
-use crate::RGLResult;
-use crate::get_rgl_result;
 
 ////////////////////////////////////////////////////////////////////
 
 #[derive(Copy, Clone, Debug)]
 pub struct VertexArrayObject {
-    vao_id: GLuint
+    pub(crate) vao_id: GLuint,
 }
 
 impl VertexArrayObject {
     pub fn none() -> Self {
-        VertexArrayObject {
-            vao_id: 0
-        }
+        VertexArrayObject { vao_id: 0 }
     }
 }
 
 pub fn gen_vertex_arrays(num: GLint) -> RGLResult<Vec<VertexArrayObject>> {
-
     if num < 1 {
         panic!("rgl: Cannot give negative value argument to glGenVertexArrays");
     }
@@ -30,7 +27,10 @@ pub fn gen_vertex_arrays(num: GLint) -> RGLResult<Vec<VertexArrayObject>> {
         gl::GenVertexArrays(num, ids.as_mut_ptr());
     }
 
-    let result = ids.drain(..).map(|vao_id| VertexArrayObject { vao_id }).collect();
+    let result = ids
+        .drain(..)
+        .map(|vao_id| VertexArrayObject { vao_id })
+        .collect();
     get_rgl_result(result)
 }
 
@@ -59,12 +59,12 @@ pub enum BufferTarget {
     ShaderStorageBuffer,
     TextureBuffer,
     TransformFeedbackBuffer,
-    UniformBuffer
+    UniformBuffer,
 }
 
 impl BufferTarget {
-    fn to_gl_code(&self) -> GLenum {
-        match *self {
+    fn to_gl_code(self) -> GLenum {
+        match self {
             BufferTarget::ArrayBuffer => gl::ARRAY_BUFFER,
             BufferTarget::AtomicCounterBuffer => gl::ATOMIC_COUNTER_BUFFER,
             BufferTarget::CopyReadBuffer => gl::COPY_READ_BUFFER,
@@ -94,7 +94,7 @@ pub enum BufferUsage {
     StaticCopy,
     DynamicDraw,
     DynamicRead,
-    DynamicCopy
+    DynamicCopy,
 }
 
 impl BufferUsage {
@@ -108,7 +108,7 @@ impl BufferUsage {
             BufferUsage::StaticCopy => gl::STATIC_COPY,
             BufferUsage::DynamicDraw => gl::DYNAMIC_DRAW,
             BufferUsage::DynamicRead => gl::DYNAMIC_READ,
-            BufferUsage::DynamicCopy => gl::DYNAMIC_COPY
+            BufferUsage::DynamicCopy => gl::DYNAMIC_COPY,
         }
     }
 }
@@ -123,7 +123,10 @@ pub trait GLBufferData {
     fn size(&self) -> GLsizeiptr;
 }
 
-impl<T> GLBufferData for Vec<T> where T: GLBufferPrimitive {
+impl<T> GLBufferData for Vec<T>
+where
+    T: GLBufferPrimitive,
+{
     fn void_ptr(&self) -> *const c_void {
         &self[0] as *const T as *const c_void
     }
@@ -138,21 +141,33 @@ impl<T> GLBufferData for Vec<T> where T: GLBufferPrimitive {
 
 #[derive(Copy, Clone, Debug)]
 pub struct BufferObject {
-    buffer_id: GLuint
+    pub(crate) buffer_id: GLuint,
 }
 
-pub fn gen_buffers(num: GLint) ->  RGLResult<Vec<BufferObject>> {
+impl BufferObject {
+    pub fn none() -> Self {
+        BufferObject { buffer_id: 0 }
+    }
+}
+
+pub fn gen_buffers(num: GLint) -> RGLResult<Vec<BufferObject>> {
     if num < 1 {
-        panic!("rgl: Invalid parameter {} to glGenBuffers, must be 1 or greater.");
+        panic!(
+            "rgl: Invalid parameter {} to glGenBuffers, must be 1 or greater.",
+            num
+        );
     }
 
     let mut ids = Vec::with_capacity(num as usize);
 
     unsafe {
-        gl::GenBuffers(num,  ids.as_mut_ptr());
+        gl::GenBuffers(num, ids.as_mut_ptr());
     }
 
-    let result = ids.drain(..).map(|buffer_id| BufferObject { buffer_id }).collect();
+    let result = ids
+        .drain(..)
+        .map(|buffer_id| BufferObject { buffer_id })
+        .collect();
     get_rgl_result(result)
 }
 
@@ -164,26 +179,32 @@ pub fn bind_buffer(target: BufferTarget, buffer: BufferObject) -> RGLResult<()> 
     get_rgl_result(())
 }
 
-pub fn buffer_data<T>(target: BufferTarget, data: &T,  usage: BufferUsage) -> RGLResult<()> where T: GLBufferData {
+pub fn buffer_data<T>(target: BufferTarget, data: &T, usage: BufferUsage) -> RGLResult<()>
+where
+    T: GLBufferData,
+{
     unsafe {
         gl::BufferData(
             target.to_gl_code(),
             data.size(),
             data.void_ptr(),
-            usage.to_gl_code()
+            usage.to_gl_code(),
         );
     }
 
     get_rgl_result(())
 }
 
-pub fn named_buffer_data<T>(buffer: BufferObject, data: &T, usage: BufferUsage) -> RGLResult<()> where T: GLBufferData {
+pub fn named_buffer_data<T>(buffer: BufferObject, data: &T, usage: BufferUsage) -> RGLResult<()>
+where
+    T: GLBufferData,
+{
     unsafe {
         gl::NamedBufferData(
             buffer.buffer_id,
             data.size(),
             data.void_ptr(),
-            usage.to_gl_code()
+            usage.to_gl_code(),
         );
     }
 

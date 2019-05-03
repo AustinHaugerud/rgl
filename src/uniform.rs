@@ -1,22 +1,18 @@
-use crate::ShaderProgram;
 use crate::get_rgl_result;
 use crate::RGLResult;
-use std::ffi::CStr;
+use crate::ShaderProgram;
 use gl::types::*;
+use std::ffi::CStr;
 
 #[derive(Copy, Clone, Debug)]
 pub struct UniformLocation {
-    pub(crate) loc: GLint
+    pub(crate) loc: GLint,
 }
 
 pub fn get_uniform_location(program: ShaderProgram, name: &CStr) -> RGLResult<UniformLocation> {
-    let loc = unsafe {
-        gl::GetUniformLocation(program.program_id, name.as_ptr())
-    };
+    let loc = unsafe { gl::GetUniformLocation(program.program_id, name.as_ptr()) };
 
-    let location = UniformLocation {
-        loc
-    };
+    let location = UniformLocation { loc };
 
     get_rgl_result(location)
 }
@@ -119,7 +115,11 @@ pub fn uniform4ui(location: UniformLocation, v0: u32, v1: u32, v2: u32, v3: u32)
 
 pub fn uniform1fv(location: UniformLocation, data: &[f32]) -> RGLResult<()> {
     unsafe {
-        gl::Uniform1fv(location.loc, data.len() as GLsizei, data.as_ptr() as *const GLfloat);
+        gl::Uniform1fv(
+            location.loc,
+            data.len() as GLsizei,
+            data.as_ptr() as *const GLfloat,
+        );
     }
 
     get_rgl_result(())
@@ -127,7 +127,11 @@ pub fn uniform1fv(location: UniformLocation, data: &[f32]) -> RGLResult<()> {
 
 pub fn uniform2fv(location: UniformLocation, data: &[f32]) -> RGLResult<()> {
     unsafe {
-        gl::Uniform2fv(location.loc, (data.len() / 2) as GLsizei, data.as_ptr() as *const GLfloat);
+        gl::Uniform2fv(
+            location.loc,
+            (data.len() / 2) as GLsizei,
+            data.as_ptr() as *const GLfloat,
+        );
     }
 
     get_rgl_result(())
@@ -135,7 +139,11 @@ pub fn uniform2fv(location: UniformLocation, data: &[f32]) -> RGLResult<()> {
 
 pub fn uniform3fv(location: UniformLocation, data: &[f32]) -> RGLResult<()> {
     unsafe {
-        gl::Uniform3fv(location.loc, (data.len() / 3) as GLsizei, data.as_ptr() as *const GLfloat);
+        gl::Uniform3fv(
+            location.loc,
+            (data.len() / 3) as GLsizei,
+            data.as_ptr() as *const GLfloat,
+        );
     }
 
     get_rgl_result(())
@@ -143,7 +151,11 @@ pub fn uniform3fv(location: UniformLocation, data: &[f32]) -> RGLResult<()> {
 
 pub fn uniform4fv(location: UniformLocation, data: &[f32]) -> RGLResult<()> {
     unsafe {
-        gl::Uniform4fv(location.loc, (data.len() / 4) as GLsizei, data.as_ptr() as *const GLfloat);
+        gl::Uniform4fv(
+            location.loc,
+            (data.len() / 4) as GLsizei,
+            data.as_ptr() as *const GLfloat,
+        );
     }
 
     get_rgl_result(())
@@ -151,7 +163,11 @@ pub fn uniform4fv(location: UniformLocation, data: &[f32]) -> RGLResult<()> {
 
 pub fn uniform1iv(location: UniformLocation, data: &[i32]) -> RGLResult<()> {
     unsafe {
-        gl::Uniform1iv(location.loc, data.len() as GLsizei, data.as_ptr() as *const GLint);
+        gl::Uniform1iv(
+            location.loc,
+            data.len() as GLsizei,
+            data.as_ptr() as *const GLint,
+        );
     }
 
     get_rgl_result(())
@@ -159,7 +175,11 @@ pub fn uniform1iv(location: UniformLocation, data: &[i32]) -> RGLResult<()> {
 
 pub fn uniform2iv(location: UniformLocation, data: &[i32]) -> RGLResult<()> {
     unsafe {
-        gl::Uniform2iv(location.loc, (data.len() / 2) as GLsizei, data.as_ptr() as *const GLint);
+        gl::Uniform2iv(
+            location.loc,
+            (data.len() / 2) as GLsizei,
+            data.as_ptr() as *const GLint,
+        );
     }
 
     get_rgl_result(())
@@ -167,7 +187,11 @@ pub fn uniform2iv(location: UniformLocation, data: &[i32]) -> RGLResult<()> {
 
 pub fn uniform3iv(location: UniformLocation, data: &[i32]) -> RGLResult<()> {
     unsafe {
-        gl::Uniform3iv(location.loc, (data.len() / 3) as GLsizei, data.as_ptr() as *const GLint);
+        gl::Uniform3iv(
+            location.loc,
+            (data.len() / 3) as GLsizei,
+            data.as_ptr() as *const GLint,
+        );
     }
 
     get_rgl_result(())
@@ -175,7 +199,11 @@ pub fn uniform3iv(location: UniformLocation, data: &[i32]) -> RGLResult<()> {
 
 pub fn uniform4iv(location: UniformLocation, data: &[i32]) -> RGLResult<()> {
     unsafe {
-        gl::Uniform4iv(location.loc, (data.len() / 4) as GLsizei, data.as_ptr() as *const GLint);
+        gl::Uniform4iv(
+            location.loc,
+            (data.len() / 4) as GLsizei,
+            data.as_ptr() as *const GLint,
+        );
     }
 
     get_rgl_result(())
@@ -183,7 +211,11 @@ pub fn uniform4iv(location: UniformLocation, data: &[i32]) -> RGLResult<()> {
 
 pub fn uniform1uiv(location: UniformLocation, data: &[u32]) -> RGLResult<()> {
     unsafe {
-        gl::Uniform1uiv(location.loc, data.len() as GLsizei, data.as_ptr() as *const GLuint);
+        gl::Uniform1uiv(
+            location.loc,
+            data.len() as GLsizei,
+            data.as_ptr() as *const GLuint,
+        );
     }
 
     get_rgl_result(())
@@ -191,7 +223,11 @@ pub fn uniform1uiv(location: UniformLocation, data: &[u32]) -> RGLResult<()> {
 
 pub fn uniform2uiv(location: UniformLocation, data: &[u32]) -> RGLResult<()> {
     unsafe {
-        gl::Uniform2uiv(location.loc, (data.len() / 2) as GLsizei, data.as_ptr() as *const GLuint);
+        gl::Uniform2uiv(
+            location.loc,
+            (data.len() / 2) as GLsizei,
+            data.as_ptr() as *const GLuint,
+        );
     }
 
     get_rgl_result(())
@@ -199,7 +235,11 @@ pub fn uniform2uiv(location: UniformLocation, data: &[u32]) -> RGLResult<()> {
 
 pub fn uniform3uiv(location: UniformLocation, data: &[u32]) -> RGLResult<()> {
     unsafe {
-        gl::Uniform3uiv(location.loc, (data.len() / 3) as GLsizei, data.as_ptr() as *const GLuint);
+        gl::Uniform3uiv(
+            location.loc,
+            (data.len() / 3) as GLsizei,
+            data.as_ptr() as *const GLuint,
+        );
     }
 
     get_rgl_result(())
@@ -207,79 +247,164 @@ pub fn uniform3uiv(location: UniformLocation, data: &[u32]) -> RGLResult<()> {
 
 pub fn uniform4uiv(location: UniformLocation, data: &[u32]) -> RGLResult<()> {
     unsafe {
-        gl::Uniform4uiv(location.loc, (data.len() / 4) as GLsizei, data.as_ptr() as *const GLuint);
+        gl::Uniform4uiv(
+            location.loc,
+            (data.len() / 4) as GLsizei,
+            data.as_ptr() as *const GLuint,
+        );
     }
 
     get_rgl_result(())
 }
 
-pub fn uniform_matrix2fv(location: UniformLocation, transpose: bool, data: &[f32]) -> RGLResult<()> {
+pub fn uniform_matrix2fv(
+    location: UniformLocation,
+    transpose: bool,
+    data: &[f32],
+) -> RGLResult<()> {
     unsafe {
-        gl::UniformMatrix2fv(location.loc, (data.len() / (2 * 2)) as GLsizei, transpose as GLboolean, data.as_ptr() as *const GLfloat);
+        gl::UniformMatrix2fv(
+            location.loc,
+            (data.len() / (2 * 2)) as GLsizei,
+            transpose as GLboolean,
+            data.as_ptr() as *const GLfloat,
+        );
     }
 
     get_rgl_result(())
 }
 
-pub fn uniform_matrix3fv(location: UniformLocation, transpose: bool, data: &[f32]) -> RGLResult<()> {
+pub fn uniform_matrix3fv(
+    location: UniformLocation,
+    transpose: bool,
+    data: &[f32],
+) -> RGLResult<()> {
     unsafe {
-        gl::UniformMatrix3fv(location.loc, (data.len() / (3 * 3)) as GLsizei, transpose as GLboolean, data.as_ptr() as *const GLfloat);
+        gl::UniformMatrix3fv(
+            location.loc,
+            (data.len() / (3 * 3)) as GLsizei,
+            transpose as GLboolean,
+            data.as_ptr() as *const GLfloat,
+        );
     }
 
     get_rgl_result(())
 }
 
-pub fn uniform_matrix4fv(location: UniformLocation, transpose: bool, data: &[f32]) -> RGLResult<()> {
+pub fn uniform_matrix4fv(
+    location: UniformLocation,
+    transpose: bool,
+    data: &[f32],
+) -> RGLResult<()> {
     unsafe {
-        gl::UniformMatrix4fv(location.loc, (data.len() / (4 * 4)) as GLsizei, transpose as GLboolean, data.as_ptr() as *const GLfloat);
+        gl::UniformMatrix4fv(
+            location.loc,
+            (data.len() / (4 * 4)) as GLsizei,
+            transpose as GLboolean,
+            data.as_ptr() as *const GLfloat,
+        );
     }
 
     get_rgl_result(())
 }
 
-pub fn uniform_matrix2x3fv(location: UniformLocation, transpose: bool, data: &[f32]) -> RGLResult<()> {
+pub fn uniform_matrix2x3fv(
+    location: UniformLocation,
+    transpose: bool,
+    data: &[f32],
+) -> RGLResult<()> {
     unsafe {
-        gl::UniformMatrix2x3fv(location.loc,  (data.len() / (2 * 3)) as GLsizei, transpose as GLboolean, data.as_ptr() as *const GLfloat);
+        gl::UniformMatrix2x3fv(
+            location.loc,
+            (data.len() / (2 * 3)) as GLsizei,
+            transpose as GLboolean,
+            data.as_ptr() as *const GLfloat,
+        );
     }
 
     get_rgl_result(())
 }
 
-pub fn uniform_matrix3x2fv(location: UniformLocation, transpose: bool, data: &[f32]) -> RGLResult<()> {
+pub fn uniform_matrix3x2fv(
+    location: UniformLocation,
+    transpose: bool,
+    data: &[f32],
+) -> RGLResult<()> {
     unsafe {
-        gl::UniformMatrix3x2fv(location.loc,  (data.len() / (3 * 2)) as GLsizei, transpose as GLboolean, data.as_ptr() as *const GLfloat);
+        gl::UniformMatrix3x2fv(
+            location.loc,
+            (data.len() / (3 * 2)) as GLsizei,
+            transpose as GLboolean,
+            data.as_ptr() as *const GLfloat,
+        );
     }
 
     get_rgl_result(())
 }
 
-pub fn uniform_matrix2x4fv(location: UniformLocation, transpose: bool, data: &[f32]) -> RGLResult<()> {
+pub fn uniform_matrix2x4fv(
+    location: UniformLocation,
+    transpose: bool,
+    data: &[f32],
+) -> RGLResult<()> {
     unsafe {
-        gl::UniformMatrix2x4fv(location.loc,  (data.len() / (2 * 4)) as GLsizei, transpose as GLboolean, data.as_ptr() as *const GLfloat);
+        gl::UniformMatrix2x4fv(
+            location.loc,
+            (data.len() / (2 * 4)) as GLsizei,
+            transpose as GLboolean,
+            data.as_ptr() as *const GLfloat,
+        );
     }
 
     get_rgl_result(())
 }
 
-pub fn uniform_matrix4x2fv(location: UniformLocation, transpose: bool, data: &[f32]) -> RGLResult<()> {
+pub fn uniform_matrix4x2fv(
+    location: UniformLocation,
+    transpose: bool,
+    data: &[f32],
+) -> RGLResult<()> {
     unsafe {
-        gl::UniformMatrix4x2fv(location.loc,  (data.len() / (4 * 2)) as GLsizei, transpose as GLboolean, data.as_ptr() as *const GLfloat);
+        gl::UniformMatrix4x2fv(
+            location.loc,
+            (data.len() / (4 * 2)) as GLsizei,
+            transpose as GLboolean,
+            data.as_ptr() as *const GLfloat,
+        );
     }
 
     get_rgl_result(())
 }
 
-pub fn uniform_matrix3x4fv(location: UniformLocation, transpose: bool, data: &[f32]) -> RGLResult<()> {
+pub fn uniform_matrix3x4fv(
+    location: UniformLocation,
+    transpose: bool,
+    data: &[f32],
+) -> RGLResult<()> {
     unsafe {
-        gl::UniformMatrix3x4fv(location.loc,  (data.len() / (3 * 4)) as GLsizei, transpose as GLboolean, data.as_ptr() as *const GLfloat);
+        gl::UniformMatrix3x4fv(
+            location.loc,
+            (data.len() / (3 * 4)) as GLsizei,
+            transpose as GLboolean,
+            data.as_ptr() as *const GLfloat,
+        );
     }
 
     get_rgl_result(())
 }
 
-pub fn uniform_matrix4x3fv(location: UniformLocation, transpose: bool, data: &[f32]) -> RGLResult<()> {
+pub fn uniform_matrix4x3fv(
+    location: UniformLocation,
+    transpose: bool,
+    data: &[f32],
+) -> RGLResult<()> {
     unsafe {
-        gl::UniformMatrix4x3fv(location.loc,  (data.len() / (4 * 3)) as GLsizei, transpose as GLboolean, data.as_ptr() as *const GLfloat);
+        gl::UniformMatrix4x3fv(
+            location.loc,
+            (data.len() / (4 * 3)) as GLsizei,
+            transpose as GLboolean,
+            data.as_ptr() as *const GLfloat,
+        );
     }
 
     get_rgl_result(())
