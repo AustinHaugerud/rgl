@@ -18,10 +18,10 @@ impl VertexArrayObject {
 
 pub fn gen_vertex_arrays(num: GLint) -> RGLResult<Vec<VertexArrayObject>> {
     if num < 1 {
-        panic!("rgl: Cannot give negative value argument to glGenVertexArrays");
+        panic!("rgl: Cannot give this value argument to glGenVertexArrays");
     }
 
-    let mut ids = Vec::with_capacity(num as usize);
+    let mut ids = vec![0; num as usize];
 
     unsafe {
         gl::GenVertexArrays(num, ids.as_mut_ptr());
@@ -158,7 +158,7 @@ pub fn gen_buffers(num: GLint) -> RGLResult<Vec<BufferObject>> {
         );
     }
 
-    let mut ids = Vec::with_capacity(num as usize);
+    let mut ids = vec![0; num as usize];
 
     unsafe {
         gl::GenBuffers(num, ids.as_mut_ptr());
