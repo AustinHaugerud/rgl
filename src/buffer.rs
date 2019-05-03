@@ -173,7 +173,7 @@ pub fn gen_buffers(num: GLint) -> RGLResult<Vec<BufferObject>> {
 
 pub fn bind_buffer(target: BufferTarget, buffer: BufferObject) -> RGLResult<()> {
     unsafe {
-        gl::BindBuffer(buffer.buffer_id, target.to_gl_code());
+        gl::BindBuffer(target.to_gl_code(), buffer.buffer_id);
     }
 
     get_rgl_result(())
