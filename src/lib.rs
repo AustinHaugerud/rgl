@@ -1,5 +1,4 @@
 extern crate gl;
-extern crate either;
 use gl::types::*;
 
 mod shader;
@@ -48,7 +47,7 @@ pub fn clear(buffer: BufferType) {
 
 ////////////////////////////////////////////////////
 
-#[derive(Copy, Clone, PartialEq)]
+#[derive(Copy, Clone, PartialEq, Debug)]
 pub enum Error {
     NoError,
     InvalidEnum,

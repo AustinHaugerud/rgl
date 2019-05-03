@@ -2,7 +2,6 @@ use gl::types::*;
 use crate::RGLResult;
 use crate::Error;
 use crate::get_rgl_result;
-use either::Either;
 
 #[derive(Copy, Clone, Debug)]
 pub enum ShaderType {

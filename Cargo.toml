@@ -6,4 +6,3 @@ edition = "2018"
 
 [dependencies]
 gl = "*"
-either = "1.5.2"
