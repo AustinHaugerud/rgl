@@ -2,11 +2,13 @@ extern crate gl;
 use gl::types::*;
 
 mod attributes;
+mod draw;
 mod buffer;
 mod shader;
 mod uniform;
 
 pub use attributes::*;
+pub use draw::*;
 pub use buffer::*;
 pub use shader::*;
 pub use uniform::*;
