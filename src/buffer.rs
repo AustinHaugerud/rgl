@@ -365,7 +365,7 @@ impl<T, K, U> Drop for BufferObject<T, K, U> where T: BufferType<K>, U: BufferUs
     }
 }
 
-pub fn gen_buffers<T, K, U>(num: GLint) -> RGLResult<Vec<BufferObject<T, K, U>>> where T: BufferType<K>, U: BufferUsage {
+pub fn create_buffers<T, K, U>(num: GLint) -> RGLResult<Vec<BufferObject<T, K, U>>> where T: BufferType<K>, U: BufferUsage {
     if num < 1 {
         panic!(
             "rgl: Invalid parameter {} to glGenBuffers, must be 1 or greater.",
@@ -376,7 +376,7 @@ pub fn gen_buffers<T, K, U>(num: GLint) -> RGLResult<Vec<BufferObject<T, K, U>>>
     let mut ids = vec![0u32; num as usize];
 
     unsafe {
-        gl::GenBuffers(num, ids.as_mut_ptr());
+        gl::CreateBuffers(num, ids.as_mut_ptr());
     }
 
     let result = ids
