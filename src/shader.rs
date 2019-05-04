@@ -2,26 +2,52 @@ use crate::get_rgl_result;
 use crate::Error;
 use crate::RGLResult;
 use gl::types::*;
+use std::marker::PhantomData;
 
-#[derive(Copy, Clone, Debug)]
-pub enum ShaderType {
-    Vertex,
-    Fragment,
+pub struct VertexShaderType;
+pub struct FragmentShaderType;
+
+mod private {
+
+    use super::{
+        VertexShaderType,
+        FragmentShaderType,
+    };
+
+    pub trait PrivShaderType {}
+
+    impl PrivShaderType for VertexShaderType {}
+    impl PrivShaderType for FragmentShaderType {}
 }
 
-impl ShaderType {
-    fn to_gl_code(self) -> GLenum {
-        match self {
-            ShaderType::Vertex => gl::VERTEX_SHADER,
-            ShaderType::Fragment => gl::FRAGMENT_SHADER,
-        }
+pub trait ShaderType : private::PrivShaderType {
+    fn to_gl_code() -> GLenum;
+}
+
+impl ShaderType for VertexShaderType {
+    fn to_gl_code() -> GLenum {
+        gl::VERTEX_SHADER
     }
 }
 
-#[derive(Copy, Clone, Debug)]
-pub struct Shader {
+impl ShaderType for FragmentShaderType {
+    fn to_gl_code() -> GLenum {
+        gl::FRAGMENT_SHADER
+    }
+}
+
+#[derive(Debug)]
+pub struct Shader<T> where T: ShaderType {
     shader_id: GLuint,
-    shader_type: ShaderType,
+    type_marker: PhantomData<T>,
+}
+
+impl<T> Drop for Shader<T> where T: ShaderType {
+    fn drop(&mut self) {
+        unsafe {
+            gl::DeleteShader(self.shader_id);
+        }
+    }
 }
 
 #[derive(Copy, Clone, Debug)]
@@ -45,9 +71,17 @@ impl ShaderObjectParameter {
     }
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Debug)]
 pub struct ShaderProgram {
     pub(crate) program_id: GLuint,
+}
+
+impl Drop for ShaderProgram {
+    fn drop(&mut self) {
+        unsafe {
+            gl::DeleteProgram(self.program_id);
+        }
+    }
 }
 
 #[derive(Copy, Clone, Debug)]
@@ -83,17 +117,15 @@ impl ShaderProgramObjectParameter {
 
 ////////////////////////////////////////////////////////////////
 
-// We ensure the GLenum value is valid already, so
-// we don't return RGLResult in this case.
-pub fn create_shader(shader_type: ShaderType) -> Shader {
-    let shader_id = unsafe { gl::CreateShader(shader_type.to_gl_code()) };
+pub fn create_shader<T>() -> Shader<T> where T: ShaderType {
+    let shader_id = unsafe { gl::CreateShader(T::to_gl_code()) };
     Shader {
         shader_id,
-        shader_type,
+        type_marker: PhantomData
     }
 }
 
-pub fn shader_source(shader: Shader, source: &str) -> RGLResult<()> {
+pub fn shader_source<T>(shader: &Shader<T>, source: &str) -> RGLResult<()> where T: ShaderType {
     use std::ffi::CString;
     use std::ptr::null;
 
@@ -114,20 +146,20 @@ pub enum CompileShaderError {
     Compile(String),
 }
 
-pub fn compile_shader(shader: Shader) -> Result<(), CompileShaderError> {
+pub fn compile_shader<T>(shader: Shader<T>) -> Result<(), CompileShaderError> where T: ShaderType {
     unsafe {
         gl::CompileShader(shader.shader_id);
     }
 
     let se_map = |e| CompileShaderError::Standard(e);
 
-    let failure = get_shader_iv(shader, ShaderObjectParameter::CompileStatus).map_err(se_map)? == 0;
+    let failure = get_shader_iv(&shader, ShaderObjectParameter::CompileStatus).map_err(se_map)? == 0;
 
     if failure {
         let info_log_len =
-            get_shader_iv(shader, ShaderObjectParameter::InfoLogLength).map_err(se_map)?;
+            get_shader_iv(&shader, ShaderObjectParameter::InfoLogLength).map_err(se_map)?;
 
-        let log = if let Ok(success) = get_shader_info_log(shader, info_log_len) {
+        let log = if let Ok(success) = get_shader_info_log(&shader, info_log_len) {
             success
         } else {
             String::from("Failed to retrieve info log.")
@@ -139,21 +171,7 @@ pub fn compile_shader(shader: Shader) -> Result<(), CompileShaderError> {
     }
 }
 
-pub fn is_shader(shader: Shader) -> bool {
-    let result = unsafe { gl::IsShader(shader.shader_id) };
-
-    result != 0
-}
-
-pub fn delete_shader(shader: Shader) -> RGLResult<()> {
-    unsafe {
-        gl::DeleteShader(shader.shader_id);
-    }
-
-    get_rgl_result(())
-}
-
-pub fn get_shader_iv(shader: Shader, pname: ShaderObjectParameter) -> RGLResult<GLint> {
+pub fn get_shader_iv<T>(shader: &Shader<T>, pname: ShaderObjectParameter) -> RGLResult<GLint> where T: ShaderType {
     let mut result: GLint = 0;
 
     unsafe {
@@ -169,7 +187,7 @@ pub enum InfoLogError {
     Standard(Vec<Error>),
 }
 
-pub fn get_shader_info_log(shader: Shader, len: GLsizei) -> Result<String, InfoLogError> {
+pub fn get_shader_info_log<T>(shader: &Shader<T>, len: GLsizei) -> Result<String, InfoLogError> where T: ShaderType {
     use std::ffi::CString;
     use std::ptr::null_mut;
 
@@ -199,7 +217,7 @@ pub fn create_program() -> ShaderProgram {
     ShaderProgram { program_id }
 }
 
-pub fn attach_shader(program: ShaderProgram, shader: Shader) -> RGLResult<()> {
+pub fn attach_shader<T>(program: ShaderProgram, shader: &Shader<T>) -> RGLResult<()> where T: ShaderType {
     unsafe {
         gl::AttachShader(program.program_id, shader.shader_id);
     }
@@ -213,7 +231,7 @@ pub enum LinkProgramError {
     Standard(Vec<Error>),
 }
 
-pub fn link_program(program: ShaderProgram) -> Result<(), LinkProgramError> {
+pub fn link_program(program: &ShaderProgram) -> Result<(), LinkProgramError> {
     unsafe {
         gl::LinkProgram(program.program_id);
     }
@@ -221,13 +239,13 @@ pub fn link_program(program: ShaderProgram) -> Result<(), LinkProgramError> {
     let se_map = |e| LinkProgramError::Standard(e);
 
     let failure =
-        get_program_iv(program, ShaderProgramObjectParameter::LinkStatus).map_err(se_map)? == 0;
+        get_program_iv(&program, ShaderProgramObjectParameter::LinkStatus).map_err(se_map)? == 0;
 
     if failure {
         let log_len =
-            get_program_iv(program, ShaderProgramObjectParameter::InfoLogLength).map_err(se_map)?;
+            get_program_iv(&program, ShaderProgramObjectParameter::InfoLogLength).map_err(se_map)?;
 
-        let log = if let Ok(success) = get_program_info_log(program, log_len) {
+        let log = if let Ok(success) = get_program_info_log(&program, log_len) {
             success
         } else {
             String::from("rgl: Failed to get program info log.")
@@ -240,7 +258,7 @@ pub fn link_program(program: ShaderProgram) -> Result<(), LinkProgramError> {
 }
 
 pub fn get_program_iv(
-    program: ShaderProgram,
+    program: &ShaderProgram,
     pname: ShaderProgramObjectParameter,
 ) -> RGLResult<GLint> {
     let mut result: GLint = 0;
@@ -252,7 +270,7 @@ pub fn get_program_iv(
     get_rgl_result(result)
 }
 
-pub fn get_program_info_log(program: ShaderProgram, len: GLsizei) -> Result<String, InfoLogError> {
+pub fn get_program_info_log(program: &ShaderProgram, len: GLsizei) -> Result<String, InfoLogError> {
     use std::ffi::CString;
     use std::ptr::null_mut;
 
@@ -276,7 +294,7 @@ pub fn get_program_info_log(program: ShaderProgram, len: GLsizei) -> Result<Stri
     }
 }
 
-pub fn use_program(program: ShaderProgram) -> RGLResult<()> {
+pub fn use_program(program: &ShaderProgram) -> RGLResult<()> {
     unsafe {
         gl::UseProgram(program.program_id);
     }

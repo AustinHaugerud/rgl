@@ -1,4 +1,5 @@
 extern crate gl;
+
 use gl::types::*;
 
 mod attributes;
@@ -6,12 +7,14 @@ mod draw;
 mod buffer;
 mod shader;
 mod uniform;
+mod primitive;
 
 pub use attributes::*;
 pub use draw::*;
 pub use buffer::*;
 pub use shader::*;
 pub use uniform::*;
+pub use primitive::*;
 
 pub type RGLResult<T> = Result<T, Vec<Error>>;
 

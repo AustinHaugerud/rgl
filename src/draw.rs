@@ -1,44 +1,9 @@
 use gl::types::*;
-use crate::{RGLResult, get_rgl_result};
+use crate::{Primitive,  RGLResult, get_rgl_result};
 
-#[derive(Copy, Clone, Debug)]
-pub enum Primitive {
-    Points,
-    LineStrip,
-    LineLoop,
-    Lines,
-    LineStripAdjacency,
-    LinesAdjacency,
-    TriangleStrip,
-    TriangleFan,
-    Triangles,
-    TriangleStripAdjacency,
-    TrianglesAdjacency,
-    Patches,
-}
-
-impl Primitive {
-    pub(crate) fn to_gl_code(self) -> GLenum {
-        match self {
-            Primitive::Points => gl::POINTS,
-            Primitive::LineStrip => gl::LINE_STRIP,
-            Primitive::LineLoop => gl::LINE_LOOP,
-            Primitive::Lines => gl::LINES,
-            Primitive::LineStripAdjacency => gl::LINE_STRIP_ADJACENCY,
-            Primitive::LinesAdjacency => gl::LINES_ADJACENCY,
-            Primitive::TriangleStrip => gl::TRIANGLE_STRIP,
-            Primitive::TriangleFan => gl::TRIANGLE_FAN,
-            Primitive::Triangles => gl::TRIANGLES,
-            Primitive::TriangleStripAdjacency => gl::TRIANGLE_STRIP_ADJACENCY,
-            Primitive::TrianglesAdjacency => gl::TRIANGLES_ADJACENCY,
-            Primitive::Patches => gl::PATCHES
-        }
-    }
-}
-
-pub fn draw_arrays(mode: Primitive, first: GLint, count: GLsizei) -> RGLResult<()> {
+pub fn draw_arrays<P>(first: GLint, count: GLsizei) -> RGLResult<()> where P: Primitive {
     unsafe {
-        gl::DrawArrays(mode.to_gl_code(), first, count);
+        gl::DrawArrays(P::to_gl_code(), first, count);
     }
 
     get_rgl_result(())
@@ -76,18 +41,18 @@ impl ElementIndexType for u32 {
     }
 }
 
-pub fn draw_elements<T>(mode: Primitive, count: GLsizei, indices: Option<&[T]>) -> RGLResult<()> where T: ElementIndexType {
+pub fn draw_elements<P, T>(count: GLsizei, indices: Option<&[T]>) -> RGLResult<()> where T: ElementIndexType, P: Primitive {
     use std::ptr;
     use std::ffi::c_void;
 
     if let Some(index_data) = indices {
         unsafe {
-            gl::DrawElements(mode.to_gl_code(), count, T::to_gl_code(), &index_data[0] as *const T as *const c_void);
+            gl::DrawElements(P::to_gl_code(), count, T::to_gl_code(), &index_data[0] as *const T as *const c_void);
         }
     }
     else {
         unsafe {
-            gl::DrawElements(mode.to_gl_code(), count, T::to_gl_code(), ptr::null());
+            gl::DrawElements(P::to_gl_code(), count, T::to_gl_code(), ptr::null());
         }
     }
 
