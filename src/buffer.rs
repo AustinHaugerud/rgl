@@ -400,7 +400,7 @@ pub fn bind_buffer<T, K, U>(buffer_option: Option<&BufferObject<T, K, U>>) -> RG
     get_rgl_result(())
 }
 
-pub fn named_buffer_data<T, K, U>(buffer: BufferObject<T, K, U>, data: &[K]) -> RGLResult<()> where T: BufferType<K>, U: BufferUsage {
+pub fn named_buffer_data<T, K, U>(buffer: &BufferObject<T, K, U>, data: &[K]) -> RGLResult<()> where T: BufferType<K>, U: BufferUsage {
     use std::mem;
     use std::ffi::c_void;
 
