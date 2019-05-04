@@ -116,6 +116,7 @@ impl BufferUsage {
 pub unsafe trait GLBufferPrimitive {}
 
 unsafe impl GLBufferPrimitive for f32 {}
+
 unsafe impl GLBufferPrimitive for i32 {}
 
 pub trait GLBufferData {
