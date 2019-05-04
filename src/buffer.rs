@@ -358,7 +358,6 @@ pub struct BufferObject<T, K, U> where T: BufferType<K>, U: BufferUsage {
 
 impl<T, K, U> Drop for BufferObject<T, K, U> where T: BufferType<K>, U: BufferUsage {
     fn drop(&mut self) {
-        println!("Drop!");
         unsafe {
             gl::DeleteBuffers(1, &self.buffer_id);
         }
