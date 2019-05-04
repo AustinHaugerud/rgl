@@ -217,9 +217,17 @@ pub fn create_program() -> ShaderProgram {
     ShaderProgram { program_id }
 }
 
-pub fn attach_shader<T>(program: ShaderProgram, shader: &Shader<T>) -> RGLResult<()> where T: ShaderType {
+pub fn attach_shader<T>(program: &ShaderProgram, shader: &Shader<T>) -> RGLResult<()> where T: ShaderType {
     unsafe {
         gl::AttachShader(program.program_id, shader.shader_id);
+    }
+
+    get_rgl_result(())
+}
+
+pub fn detach_shader<T>(program: &ShaderProgram,  shader: &Shader<T>) -> RGLResult<()> where T: ShaderType {
+    unsafe {
+        gl::DetachShader(program.program_id, shader.shader_id);
     }
 
     get_rgl_result(())

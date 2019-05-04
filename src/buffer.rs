@@ -356,6 +356,14 @@ pub struct BufferObject<T, K, U> where T: BufferType<K>, U: BufferUsage {
     buffer_usage_marker: PhantomData<U>,
 }
 
+impl<T, K, U> Drop for BufferObject<T, K, U> where T: BufferType<K>, U: BufferUsage {
+    fn drop(&mut self) {
+        unsafe {
+            gl::DeleteBuffers(1, &self.buffer_id);
+        }
+    }
+}
+
 pub fn gen_buffers<T, K, U>(num: GLint) -> RGLResult<Vec<BufferObject<T, K, U>>> where T: BufferType<K>, U: BufferUsage {
     if num < 1 {
         panic!(
