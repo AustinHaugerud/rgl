@@ -1,6 +1,5 @@
 use crate::{get_rgl_result, RGLResult, VertexArrayObject};
 use gl::types::*;
-use std::mem;
 
 pub struct Vec1;
 pub struct Vec2;
@@ -32,9 +31,6 @@ mod private {
 
 pub trait AttributeType : private::PrivAttributeType {
     fn to_gl_code() -> GLenum;
-    fn size() -> GLsizei {
-        mem::size_of::<Self>() as GLsizei
-    }
 }
 
 impl AttributeType for i8 {
@@ -86,29 +82,29 @@ impl AttributeType for f64 {
 }
 
 pub trait AttributeVector : private::PrivAttributeVector {
-    fn len() -> GLint;
+    fn len() -> GLsizei;
 }
 
 impl AttributeVector for Vec1 {
-    fn len() ->  GLint {
+    fn len() ->  GLsizei {
         1
     }
 }
 
 impl AttributeVector for Vec2 {
-    fn len() -> GLint {
+    fn len() -> GLsizei {
         2
     }
 }
 
 impl AttributeVector for Vec3 {
-    fn len() -> GLint {
+    fn len() -> GLsizei {
         3
     }
 }
 
 impl  AttributeVector for Vec4 {
-    fn len() -> GLint {
+    fn len() -> GLsizei {
         4
     }
 }
@@ -118,6 +114,7 @@ pub fn vertex_attrib_pointer<S, T>(
     normalized: bool,
 ) -> RGLResult<()> where S: AttributeVector, T: AttributeType {
     use std::ptr;
+    use std::mem;
 
     unsafe {
         gl::VertexAttribPointer(
@@ -125,7 +122,7 @@ pub fn vertex_attrib_pointer<S, T>(
             S::len(),
             T::to_gl_code(),
             normalized as GLboolean,
-            T::size() * S::len(),
+            mem::size_of::<T>() as GLsizei * S::len(),
             ptr::null(),
         );
     }
