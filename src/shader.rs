@@ -146,7 +146,7 @@ pub enum CompileShaderError {
     Compile(String),
 }
 
-pub fn compile_shader<T>(shader: Shader<T>) -> Result<(), CompileShaderError> where T: ShaderType {
+pub fn compile_shader<T>(shader: &Shader<T>) -> Result<(), CompileShaderError> where T: ShaderType {
     unsafe {
         gl::CompileShader(shader.shader_id);
     }
