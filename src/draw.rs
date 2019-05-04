@@ -91,5 +91,5 @@ pub fn draw_elements<T>(mode: Primitive, count: GLsizei, indices: Option<&[T]>) 
         }
     }
 
-    unimplemented!()
+    get_rgl_result(())
 }
