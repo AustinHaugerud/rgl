@@ -372,7 +372,7 @@ pub fn gen_buffers<T, K, U>(num: GLint) -> RGLResult<Vec<BufferObject<T, K, U>>>
         );
     }
 
-    let mut ids = vec![0; num as usize];
+    let mut ids = vec![0u32; num as usize];
 
     unsafe {
         gl::GenBuffers(num, ids.as_mut_ptr());
